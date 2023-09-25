@@ -1,0 +1,116 @@
+1.
+nlogn, 3n+100logn, 4n, 4nlogn + 2n, n^2 + 10n, n^3, 2^10, 2^logn, 2^n
+2.
+Recursive:
+function power_of_2(integer n):
+        if n == 0:
+            return 1
+        else:
+            return 2*(power_of_2(n-1))
+-> O(n)
+Binary recursive:
+function power_of_2(integer )
+        if n == 0
+            return 1
+        if n % 2 == 0:
+            half_power = power_of_2(n / 2)
+            return half_power * half_power
+        else:
+            half_power = power_of_2((n - 1) / 2)
+            return 2 * half_power * half_power
+-> O(logn)
+3.
+	int size: size of the queue
+        int front : index of queue's first element in array
+        int rear : index of queue's last element in array
+    function enqueue(element) -> O(1)
+        if (rear + 1)%size == front: return full
+        queue[rear] = element
+        rear = (rear+1)%size
+    function dequeue() -> O(1)
+        if front == rear: return empty
+        element = queue[front]
+        front = (front+1)%size
+        return element
+    function front() -> O(1)
+        if front == rear: return empty
+        return queue[front]
+    function is_empty(queue) -> O(1)
+        return front == rear
+    function is_full(queue, size) -> O(1)
+        return (rear + 1) % size == front
+4.
+class node
+    data
+    next
+class linkedlist
+    node head
+    node tail
+    int size
+class queue
+    function queue() -> O(1)
+        linkedlist = new linkedlist()
+    function enqueue(queue, element)
+        node = new node(element) -> O(1)
+        if queue is empty:
+            queue.head = node
+            queue.tail = node
+        else:
+            queue.tail.next = node
+            queue.tail = node
+        queue.size += 1
+    function dequeue() -> O(1)
+        if queue is empty: return empty
+        element = queue.head.data
+        queue.head = queue.head.next
+        queue.size -= 1
+        return element
+    function front()    -> O(1)
+        if queue is empty: return empty
+        return queue.head.data
+    function is_empty(queue) -> O(1)
+        return queue.size == 0
+5.
+    int size : size of the stack
+    int top: index of the top of the stack in the array
+    function push(element) -> O(1)
+        if top == size - 1: return full
+        top += 1
+        stack[top] = element
+    function pop() -> O(1)
+        if top == -1: return empty
+        element = stack[top]
+        top -= 1
+        return element
+    function top() -> O(1)
+        if top == -1: return empty
+        return stack[top]
+    function is_empty() -> O(1)
+        return top == -1
+
+6.
+class node
+    data
+    next
+class linkedlist
+    node head
+    int size
+class stack
+    function stack() -> O(1)
+        linkedlist = new linkedlist()
+    function push(element) -> O(1)
+        node = new node(element)
+        node.next = stack.head
+        stack.head = node
+        stack.size += 1
+    function pop() -> O(1)
+        if stack is empty: return empty
+        element = stack.head.data
+        stack.head = stack.head.next
+        stack.size -= 1
+        return element
+    function top() -> O(1)
+        if stack is empty: return empty
+        return stack.head.data
+    function is_empty() -> O(1)
+        return stack.size == 0
