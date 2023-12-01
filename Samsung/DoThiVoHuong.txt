@@ -1,0 +1,194 @@
+1.
+	Các đồ thị có chu trình Euler: 1,3. Các đồ thị 2,4 không có chu trình Euler do có 2 đỉnh bậc lẻ.
+	Đồ thị có chu trình Hamilton: 3. Các đồ thị còn lại không có chu trình Hamilton do không thỏa mãn điều kiện Ore.
+2.
+	Một đồ thị v đỉnh có tối đa v(v-1)/2 cạnh.
+	Số đồ thị có e cạnh từ v đỉnh là số cách chọn e cạnh từ đồ thị có v đỉnh và v(v-1)/2 cạnh và bằng [(v(v-1)/2)]C(e).
+3.
+	#include <iostream>
+	#include <vector>
+	using namespace std;
+	class Graph
+	{
+   	 	int vertices;
+  	  	vector<vector<int>> adjacents;
+	public:
+  	  	Graph(int n, int m)
+  	  	{
+     	   		vertices = n;
+     	   		for (int i = 0;i < n;i++)
+      	 		{
+           		adjacents.push_back(vector<int>());
+      	 		}
+        		for (int i = 0;i < m; i++)
+        		{
+            			int x,y;
+            			cin >> x >> y;
+            			adjacents[x].push_back(y);
+            			adjacents[y].push_back(x);
+        		}
+    		}
+    		int check_parallel()
+    		{
+        		int parallels = 0;
+        		vector<bool> visited(vertices,false);
+        		for(int i = 0; i < adjacents.size(); i++)
+        		{
+            			vector<bool> check(vertices,false);
+            			for (int j = 0; j<adjacents[i].size(); j++)
+            			{
+                			if (visited[adjacents[i][j]])
+                			{
+                    				continue;
+                			}
+                			if (!check[adjacents[i][j]])
+                			{
+                    				check[adjacents[i][j]] = true;
+                			}
+                			else if (check[adjacents[i][j]])
+                			{
+                   				parallels++;
+                			}
+            			}
+            			visited[i] = true;
+        		}
+        		return parallels;
+    		}
+	};
+	int main()
+	{
+    		int n,m;
+    		cin >> n >> m;
+    		Graph g(n,m);
+    		cout<<g.check_parallel();
+	}
+4.
+	Gọi V1 và V2 là hai tập đỉnh của đồ thị. Một cạnh bất kì trong đồ thị sẽ luôn nối từ 1 đỉnh trong V1 đến 1 đỉnh trong V2 hoặc ngược lại. -> Để đi từ một đỉnh trong một tập đỉnh tới một đỉnh trong cùng tập đỉnh đó cần số chẵn các cạnh. Do vậy, để tạo thành 1 chu trình (Xuất phát và kết thúc ở cùng 1 đỉnh, và hiển nhiên cùng 1 tập), cần số cạnh nối là chẵn. Do vậy, độ dài chu trình của đồ thị Bipartile luôn là chẵn.
+5.
+	Gọi s và t là 2 đỉnh bất kỳ nằm trên đồ thị có đường đi nối giữa chúng với nhau. Giả sử a là một đường đi giữa s và t. Ta xóa một đỉnh bất kỳ trên A.
+	Vì không có đỉnh nào là đỉnh articulate -> Đồ thị vẫn liên thông -> Vẫn có ít nhất một đường đi từ s tới t. Ta gọi đường đi đó là B. Vì A chứa đỉnh vừa xóa và B không chứa đỉnh đó -> 2 đường đi là khác nhau. 
+	Vì s và t là 2 đỉnh bất kỳ -> Giữa 2 đỉnh bất kỳ trong đồ thị luôn chứa ít nhất 2 đường đi không giao nhau. -> Đồ thị là Biconnected.
+6.
+	Ý tưởng: Xóa từng cạnh của đồ thị rồi kiểm tra số thành phần liên thông có tăng hay không, nếu có thì cạnh đó là cầu.
+	-----------------------------------------------------------------------
+	#include <iostream>
+	#include <vector>
+	#include <algorithm>
+	#include <array>
+	using namespace std;
+	class Graph
+	{
+		int vertices;
+		vector<array<int,2>> edges;
+		vector<vector<int>> adjacents;
+		void depth_first_search(int index,vector<bool> &visited)
+		{
+			vector<int>::iterator i;
+			visited[index] = true;
+			for (i = adjacents[index].begin();i!=adjacents[index].end();i++)
+			{
+				if (!visited[*i]) depth_first_search(*i,visited);
+			}
+		}
+	public:
+		Graph(int n, int m)
+		{
+			vertices = n;
+			for (int i = 0;i < n;i++)
+			{
+				adjacents.push_back(vector<int>());
+			}
+			for (int i = 0;i < m; i++)
+			{
+				int x,y;
+				cin >> x >> y;
+				adjacents[x].push_back(y);
+				adjacents[y].push_back(x);
+				edges.push_back({x,y});
+			}
+		}
+		int calc_connected_components()
+		{
+			int connected_components = 0;
+			vector<bool> visited(vertices,false);
+			for (int i = 0;i < vertices;i++)
+			{
+				if (!visited[i])
+				{
+					depth_first_search(i,visited);
+					connected_components++;
+				}
+			}
+			return connected_components;
+		}
+		bool remove_edge(int beginf, int endf)
+		{
+			adjacents[beginf].erase(find(adjacents[beginf].begin(),adjacents[beginf].end(),endf));
+			adjacents[endf].erase(find(adjacents[endf].begin(),adjacents[endf].end(),beginf));
+			if (calc_connected_components() > 1) return true;
+			return false;
+		}
+		bool check_bridge()
+		{
+			for (auto i : edges)
+			{
+				if (remove_edge(i[0],i[1])) return true;
+			}
+			return false;
+		}
+	};
+	int main()
+	{
+		int n,m;
+		cin >> n >> m;
+		Graph g(n,m);
+		cout<< boolalpha <<g.check_bridge();
+	}
+7.
+	#include <iostream>
+	#include <vector>
+	using namespace std;
+
+	void floodFill(int** pic, int row, int col, int color, int rows, int cols, vector<vector<bool>> &visited)
+	{
+		if(row < 0 || col < 0 || row >= rows || col >= cols || visited[row][col])
+		{
+			return;
+		}
+		if(pic[row][col] != color)
+		{
+			return;
+		}
+		cout<<row <<" "<<col<<endl;
+		visited[row][col] = true;
+		floodFill(pic, row + 1, col, color, rows, cols, visited);
+		floodFill(pic, row - 1, col, color, rows, cols, visited);
+		floodFill(pic, row, col + 1, color, rows, cols, visited);
+		floodFill(pic, row, col - 1, color, rows, cols, visited);
+	}
+	int main()
+	{
+		int n,m;
+		cin >> n >> m;
+		vector<vector<bool>> visited(n,vector<bool>(m,0));
+		int** pic = new int*[n];
+		for (int i = 0; i < n; i++)
+		{
+			pic[i] = new int[m];
+			for (int j = 0; j<m;j++)
+				cin >> pic[i][j];
+		}
+		cout<<endl;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j<m;j++)
+			{
+				int color = pic[i][j];
+				if (!visited[i][j])
+				{
+					floodFill(pic,i,j,color,n,m,visited);
+					cout<<"\n";
+				}
+			}
+		}
+	}
